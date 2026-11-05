@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f7f6">
+<title>工作压力调音台｜工作要求与资源自评</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--ink:#24312f;--muted:#6b7774;--line:#e4e9e6;--demand:#c96f50;--resource:#32856e;--soft:#edf2ef;--shadow:0 8px 28px rgba(30,55,48,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.55}
+.wrap{max-width:850px;margin:0 auto;padding:28px 18px 60px}.hero{margin-bottom:20px}.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--resource);font-weight:700}.hero h1{font-size:clamp(25px,5vw,36px);line-height:1.2;margin:8px 0}.hero p{color:var(--muted);margin:8px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin:14px 0;box-shadow:var(--shadow)}
+.note{background:#edf3f0;border-radius:12px;padding:13px 15px;color:#52635d;font-size:13px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}.section-head h2{font-size:20px;margin:0}.score{font-size:24px;font-weight:750;font-variant-numeric:tabular-nums}.demand .score,.demand .section-head h2{color:var(--demand)}.resource .score,.resource .section-head h2{color:var(--resource)}
+.item{padding:15px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0}.itemtop{display:flex;justify-content:space-between;gap:12px;align-items:center}.itemtop strong{font-size:15px}.itemtop output{font-weight:700;font-size:14px;min-width:38px;text-align:right}.desc{font-size:12px;color:var(--muted);margin:3px 0 10px}
+input[type=range]{width:100%;accent-color:var(--resource);cursor:pointer;margin:3px 0}.demand input[type=range]{accent-color:var(--demand)}.scale{display:flex;justify-content:space-between;color:#87918e;font-size:11px}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{background:#f5f7f6;border-radius:14px;padding:16px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{font-size:32px;font-variant-numeric:tabular-nums}.metric.d strong{color:var(--demand)}.metric.r strong{color:var(--resource)}
+.status{margin-top:14px;padding:17px;border-radius:14px;background:#f5f7f6}.status h3{margin:0 0 5px;font-size:20px}.status p{margin:4px 0;color:var(--muted);font-size:13px}
+.chart{width:100%;max-width:510px;display:block;margin:8px auto 0}.chart text{font-family:inherit}
+.lowlist{display:grid;gap:8px;margin-top:10px}.lowitem{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:8px 0;font-size:14px}.pill{font-size:12px;border-radius:99px;background:#edf2ef;padding:3px 9px;color:#53645e;white-space:nowrap}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}button{border:0;border-radius:11px;padding:12px 17px;font-size:14px;font-weight:650;cursor:pointer}.primary{background:#286e5b;color:#fff}.secondary{background:#edf2ef;color:#40524b}
+.privacy{font-size:12px;color:var(--muted);margin-top:14px}.foot{font-size:12px;color:#89938f;text-align:center;margin-top:25px}
+@media(max-width:560px){.wrap{padding:20px 12px 40px}.card{padding:17px}.results{gap:8px}.metric{padding:13px}.metric strong{font-size:28px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">WORK DEMANDS · JOB RESOURCES</div>
+    <h1>工作压力调音台</h1>
+    <p>通过12项自评，看看当前的工作要求与工作资源是否匹配。</p>
+  </header>
+
+  <div class="note"><strong>作答说明</strong><br>请根据最近一个月的实际工作体验评分。1分代表“非常不符合”，5分代表“非常符合”。工作要求分数越高，表示消耗性要求越大；工作资源分数越高，表示可利用资源越充足。</div>
+
+  <section class="card demand">
+    <div class="section-head"><h2>01｜工作要求</h2><div class="score"><span>完成后查看</span></div></div>
+    <div id="demandItems"></div>
+  </section>
+
+  <section class="card resource">
+    <div class="section-head"><h2>02｜工作资源</h2><div class="score" style="font-size:14px;color:var(--muted)">完成后查看</div></div>
+    <div id="resourceItems"></div>
+  </section>
+
+  <div style="text-align:center;margin:20px 0 26px">
+    <button class="primary" id="submitBtn" type="button">完成作答，查看结果</button>
+  </div>
+
+  <section class="card" id="resultsCard" hidden>
+    <h2 style="font-size:20px;margin:0 0 14px">03｜我的测评结果</h2>
+    <div class="results">
+      <div class="metric d"><span>工作要求均分</span><strong id="dMetric">3.00</strong><span>满分5分</span></div>
+      <div class="metric r"><span>工作资源均分</span><strong id="rMetric">3.00</strong><span>满分5分</span></div>
+    </div>
+    <div class="status">
+      <div style="font-size:12px;color:#71807a">当前工作状态定位（教学参考）</div>
+      <h3 id="quadrant">高要求 × 高资源</h3>
+      <p id="interpretation">保持现有资源，关注负荷与恢复，防止持续透支。</p>
+      <p>要求－资源差值：<strong id="gap">0.00</strong></p>
+    </div>
+    <svg class="chart" viewBox="0 0 340 260" role="img" aria-label="工作要求与资源四象限定位图">
+      <rect x="52" y="18" width="126" height="98" rx="7" fill="#dcefe3"/>
+      <rect x="184" y="18" width="126" height="98" rx="7" fill="#fce8e6"/>
+      <rect x="52" y="122" width="126" height="98" rx="7" fill="#dfe8f8"/>
+      <rect x="184" y="122" width="126" height="98" rx="7" fill="#f8ebcb"/>
+      <g fill="#263832" font-size="10" text-anchor="middle">
+        <text x="115" y="47" font-weight="700">低要求 × 高资源</text><text x="115" y="65">相对宽裕</text>
+        <text x="247" y="47" font-weight="700">高要求 × 高资源</text><text x="247" y="65">挑战投入</text>
+        <text x="115" y="151" font-weight="700">低要求 × 低资源</text><text x="115" y="169">低投入风险</text>
+        <text x="247" y="151" font-weight="700">高要求 × 低资源</text><text x="247" y="169">资源透支风险</text>
+      </g>
+      <path d="M52 226H310M44 220V18" stroke="#52615b" stroke-width="1.3" fill="none"/>
+      <path d="M304 221l6 5-6 5M39 24l5-6 5 6" stroke="#52615b" fill="none"/>
+      <g fill="#687671" font-size="10"><text x="52" y="244">要求低</text><text x="310" y="244" text-anchor="end">要求高</text><text x="8" y="20">资源高</text><text x="8" y="220">资源低</text></g>
+      <circle id="plotPoint" cx="181" cy="119" r="8" fill="#253b34" stroke="#fff" stroke-width="3"/>
+    </svg>
+    <div style="font-size:12px;color:#7b8782;text-align:center">圆点表示你当前的工作要求与资源位置。以3分作为本工具的教学参考分界。</div>
+    <div style="margin-top:18px"><strong>优先关注的两项资源</strong><div class="lowlist" id="lowResources"></div></div>
+    <div class="actions">
+      <button class="primary" id="copyBtn">复制我的测评结果</button>
+      <button class="secondary" id="resetBtn">重新测评</button>
+    </div>
+    <div class="privacy">隐私说明：本页面在你的浏览器中本地计算，不会上传、保存或收集你的评分。关闭页面后，测评数据不会保留。</div>
+  </section>
+  <p class="foot">本工具为培训用途的自我反思工具，不是标准化心理测量量表，也不能用于心理健康诊断。</p>
+</main>
+<script>
+const demands=[
+ ["工作量","经常需要在有限时间内完成大量工作"],
+ ["时间压力与任务切换","工作节奏快，经常同时处理多项任务"],
+ ["情绪劳动","需要投入大量情绪精力应对客户或复杂人际关系"],
+ ["工作不确定性","经常出现临时任务或突发情况"],
+ ["角色冲突","工作要求相互冲突，或优先级不清晰"],
+ ["工作边界侵入","下班后仍需关注或处理工作事务"]
+];
+const resources=[
+ ["工作自主性","能够自主安排工作方式和完成顺序"],
+ ["社会支持","遇到困难时能够获得同事或主管支持"],
+ ["角色清晰度","拥有清晰的目标、职责和优先级信息"],
+ ["能力与工具","具备完成工作所需的知识、技能和工具"],
+ ["工作反馈","能够及时获得反馈，了解工作表现"],
+ ["恢复资源","工作安排能够留出必要的休息和恢复空间"]
+];
+let values=Array(12).fill(3);
+function makeItems(items,offset,target){
+ const root=document.getElementById(target);
+ root.innerHTML=items.map((it,i)=>`<div class="item"><div class="itemtop"><strong>${it[0]}</strong><output id="val${offset+i}">3分</output></div><div class="desc">${it[1]}</div><input type="range" min="1" max="5" step="1" value="3" id="slider${offset+i}" aria-label="${it[0]}评分"><div class="scale"><span>1 非常不符合</span><span>5 非常符合</span></div></div>`).join("");
+ items.forEach((_,i)=>document.getElementById("slider"+(offset+i)).addEventListener("input",e=>{values[offset+i]=Number(e.target.value);document.getElementById("val"+(offset+i)).textContent=e.target.value+"分"}));
+}
+makeItems(demands,0,"demandItems");makeItems(resources,6,"resourceItems");
+function avg(a){return a.reduce((x,y)=>x+y,0)/a.length}
+function update(){
+ const d=avg(values.slice(0,6)),r=avg(values.slice(6)),gap=d-r;
+ document.getElementById("dMetric").textContent=d.toFixed(2);document.getElementById("rMetric").textContent=r.toFixed(2);
+ document.getElementById("gap").textContent=(gap>0?"+":"")+gap.toFixed(2);
+ let q,desc;
+ if(d>=3&&r>=3){q="高要求 × 高资源";desc="保持现有资源，关注负荷与恢复，防止持续透支。"}
+ else if(d>=3&&r<3){q="高要求 × 低资源";desc="优先减少不必要的消耗，争取支持并补充关键资源。"}
+ else if(d<3&&r>=3){q="低要求 × 高资源";desc="保持现有资源，按需寻找有意义的挑战与成长机会。"}
+ else{q="低要求 × 低资源";desc="关注支持、反馈、成长机会与工作意义，也留意是否存在疲惫或疏离。"}
+ document.getElementById("quadrant").textContent=q;document.getElementById("interpretation").textContent=desc;
+ const x=52+((d-1)/4)*258,y=220-((r-1)/4)*202;
+ document.getElementById("plotPoint").setAttribute("cx",x);document.getElementById("plotPoint").setAttribute("cy",y);
+ const sorted=resources.map((x,i)=>({name:x[0],score:values[i+6]})).sort((a,b)=>a.score-b.score).slice(0,2);
+ document.getElementById("lowResources").innerHTML=sorted.map(x=>`<div class="lowitem"><span>${x.name}</span><span class="pill">${x.score}分</span></div>`).join("");
+}
+document.getElementById("submitBtn").addEventListener("click",()=>{
+ update();
+ const results=document.getElementById("resultsCard");
+ results.hidden=false;
+ results.scrollIntoView({behavior:"smooth",block:"start"});
+});
+function resetAssessment(shouldScroll=false){
+ values=Array(12).fill(3);
+ values.forEach((v,i)=>{
+  const slider=document.getElementById("slider"+i);
+  const label=document.getElementById("val"+i);
+  if(slider) slider.value=v;
+  if(label) label.textContent=v+"分";
+ });
+ const results=document.getElementById("resultsCard");
+ if(results) results.hidden=true;
+ if(shouldScroll) window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("resetBtn").addEventListener("click",()=>resetAssessment(true));
+
+// 每次页面重新载入或从浏览器前进/后退缓存中恢复时，都重置为初始状态。
+// 页面不会把个人作答写入浏览器存储。
+window.addEventListener("pageshow",()=>resetAssessment(false));
+
+document.getElementById("copyBtn").addEventListener("click",async()=>{
+ const d=avg(values.slice(0,6)),r=avg(values.slice(6)),gap=d-r;
+ const q=document.getElementById("quadrant").textContent;
+ const textOut=`工作压力调音台测评结果\n工作要求均分：${d.toFixed(2)}/5\n工作资源均分：${r.toFixed(2)}/5\n要求－资源差值：${gap>0?"+":""}${gap.toFixed(2)}\n状态定位：${q}\n\n工作要求：\n${demands.map((x,i)=>x[0]+"："+values[i]+"分").join("\n")}\n\n工作资源：\n${resources.map((x,i)=>x[0]+"："+values[i+6]+"分").join("\n")}\n\n说明：本工具为培训用途的自我反思工具，并非标准化心理测量量表。`;
+ try{await navigator.clipboard.writeText(textOut);document.getElementById("copyBtn").textContent="已复制！";setTimeout(()=>document.getElementById("copyBtn").textContent="复制我的测评结果",1800)}
+ catch(e){const ta=document.createElement("textarea");ta.value=textOut;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();document.getElementById("copyBtn").textContent="已复制！"}
+});
+update();
+</script>
+</body>
+</html>
